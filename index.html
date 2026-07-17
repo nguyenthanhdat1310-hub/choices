@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lựa Chọn Thông Minh — Trợ lý ra quyết định PrOACT</title>
+<style>
+  :root{
+    --paper:#F7F5F0; --card:#FFFFFF; --ink:#23303F; --ink-soft:#5A6675;
+    --line:#E3DFD5; --brass:#A66A1E; --brass-soft:#F3E7D3;
+    --good:#4C7A5C; --good-soft:#E7EFE9; --warn:#9C4A31; --warn-soft:#F6E8E2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5}
+  .serif{font-family:'Times New Roman','Segoe UI',Tahoma,serif}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:16px 20px}
+  .head-inner{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .app-title{font-family:'Times New Roman','Segoe UI',Tahoma,serif;font-size:24px}
+  .app-sub{font-size:12.5px;color:var(--ink-soft)}
+  main{max-width:1280px;margin:0 auto;padding:24px 16px 70px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 22px}
+  .row-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px}
+  h1{font-family:'Times New Roman','Segoe UI',Tahoma,serif;font-size:22px;margin:0}
+  h2{font-family:'Times New Roman','Segoe UI',Tahoma,serif;font-size:21px;margin:0 0 4px}
+  h3{font-family:'Times New Roman','Segoe UI',Tahoma,serif;font-size:16px;margin:22px 0 6px;color:var(--ink)}
+  .sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px;max-width:860px}
+  .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:10px 0 4px}
+  textarea,input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;color:var(--ink);background:#FDFCFA;resize:vertical;outline:none}
+  select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;color:var(--ink);background:#FDFCFA;outline:none}
+  input[type=number]{width:56px;padding:6px 4px;text-align:center;border:1px solid var(--line);border-radius:6px;
+    font:inherit;font-size:15px;background:#FDFCFA}
+  button{font:inherit;font-weight:600;border-radius:8px;cursor:pointer;padding:10px 20px;font-size:15px;
+    touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.08)}
+  .btn-primary{background:var(--ink);color:#fff;border:none}
+  .btn-outline{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+  .btn-subtle{background:transparent;color:var(--ink-soft);border:1px solid var(--line)}
+  .btn-small{padding:6px 12px;font-size:13px}
+  button:disabled{opacity:.4;cursor:default}
+  button:active:not(:disabled){opacity:.7}
+  .x-btn{border:none;background:none;color:var(--ink-soft);font-size:17px;padding:2px 6px;min-width:36px;min-height:36px;
+    display:inline-flex;align-items:center;justify-content:center}
+  .move-group{display:flex;flex-direction:column;gap:0;margin-right:2px}
+  .move-btn{border:none;background:none;color:var(--ink-soft);font-size:11px;padding:0 4px;min-width:24px;min-height:18px;
+    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;line-height:1}
+  .move-btn:hover{background:var(--line);color:var(--ink)}
+  .move-btn:disabled{opacity:.2;cursor:default;background:none}
+  .hint{font-size:13.5px;line-height:1.55;padding:10px 14px;border-radius:8px;margin:12px 0;max-width:860px;
+    background:var(--brass-soft);color:#6E4A17}
+  .hint.warn{background:var(--warn-soft);color:var(--warn)}
+  .hint.good{background:var(--good-soft);color:var(--good)}
+  .bulk-panel{background:#FDFCFA;border:1px solid var(--line);border-radius:10px;padding:14px;max-width:860px}
+  .bulk-panel textarea{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+  .steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .step-pill{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--ink);font-weight:400;touch-action:manipulation;min-height:36px}
+  .step-pill.done{background:var(--brass-soft)}
+  .step-pill.now{background:var(--ink);border-color:var(--ink);color:#fff}
+  .obj-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .obj-row .name{flex:1}
+  .obj-row input.edit-inline{flex:1;width:auto;padding:6px 10px}
+  input[type=range]{width:110px;accent-color:var(--brass);touch-action:manipulation}
+  .wt{font-family:'Times New Roman','Segoe UI',Tahoma,serif;width:26px;text-align:center;font-size:16px;color:var(--brass)}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink)}
+  th.alt{text-align:center;min-width:150px}
+  td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  td.score{text-align:center;padding:6px 10px}
+  td.cons-cell{padding:6px;min-width:180px}
+  td.cons-cell textarea{font-size:13px;padding:6px 8px}
+  .score-words{font-size:11px;color:var(--ink-soft);margin-top:3px;max-width:150px;margin-left:auto;margin-right:auto}
+  .table-wrap{overflow-x:auto}
+  .table-wrap table th:first-child,.table-wrap table td:first-child{
+    position:sticky;left:0;background:var(--card);z-index:1;min-width:120px;max-width:170px}
+  .bar-track{height:12px;background:var(--paper);border-radius:999px;border:1px solid var(--line);overflow:hidden}
+  .bar-fill{height:100%;background:#B9BFC7;transition:width .4s ease}
+  .bar-fill.top{background:var(--brass)}
+  .bar-head{display:flex;justify-content:space-between;font-size:14.5px;margin-bottom:4px}
+  .trap{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .trap input{margin-top:3px;accent-color:var(--brass);width:16px;height:16px}
+  .trap .t-name{font-size:14.5px;font-weight:600}
+  .trap .t-q{font-size:13.5px;color:var(--ink-soft)}
+  .leader-box{background:var(--brass-soft);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .leader-eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6E4A17}
+  .leader-name{font-family:'Times New Roman','Segoe UI',Tahoma,serif;font-size:24px}
+  .nav{display:flex;justify-content:space-between;margin-top:16px}
+  .add-row{display:flex;gap:8px}
+  .add-row input{flex:1}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+  .mini-card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;background:#FDFCFA}
+  .muted{color:var(--ink-soft);font-size:12.5px}
+  .empty{padding:36px 24px;text-align:center;color:var(--ink-soft)}
+  .strike{text-decoration:line-through}
+  .dim{opacity:.45}
+  #summary-text{width:100%;padding:14px;border:1px solid var(--line);border-radius:10px;font-size:13px;
+    background:#FDFCFA;line-height:1.6;font-family:inherit}
+  /* --- Login screen --- */
+  #login-screen{position:fixed;inset:0;background:var(--paper);z-index:999;display:flex;align-items:center;justify-content:center}
+  .login-box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 32px;max-width:380px;width:90%;text-align:center}
+  .login-box h1{margin-bottom:6px}
+  .login-box .app-sub{margin-bottom:24px}
+  .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:12px 20px;
+    font:inherit;font-size:15px;font-weight:600;border:1px solid var(--line);border-radius:8px;
+    background:var(--card);color:var(--ink);cursor:pointer;transition:box-shadow .2s}
+  .btn-google:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .login-error{color:var(--warn);font-size:13px;min-height:20px;margin-top:12px}
+  .sync-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600}
+  .sync-ok{background:var(--good-soft);color:var(--good)}
+  .sync-saving{background:#FEF3CD;color:#856404}
+  .sync-off{background:var(--warn-soft);color:var(--warn)}
+  .user-info{font-size:12px;color:var(--ink-soft)}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+<body>
+<div id="login-screen">
+  <div class="login-box">
+    <h1 class="serif">Lựa Chọn Thông Minh</h1>
+    <div class="app-sub">Đăng nhập để đồng bộ dữ liệu giữa các thiết bị</div>
+    <button class="btn-google" id="login-btn">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.01 24.01 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Đăng nhập với Google
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+<header>
+  <div class="head-inner">
+    <div>
+      <div class="app-title">Lựa Chọn Thông Minh</div>
+      <div class="app-sub">Trợ lý ra quyết định PrOACT · Hammond, Keeney &amp; Raiffa</div>
+    </div>
+    <button class="btn-subtle btn-small" id="back-btn" style="display:none">← Tất cả quyết định</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="sync-badge" class="sync-badge sync-ok" style="display:none"></span>
+      <span id="user-info" class="user-info" style="display:none"></span>
+      <button class="btn-subtle btn-small" id="logout-btn" style="display:none">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+<input type="file" id="import-file" accept=".json,application/json" style="display:none">
+
+<script>
+"use strict";
+// Global error handler — show visible error instead of blank screen on mobile
+window.onerror = function(msg, src, line, col, err){
+  const m = document.getElementById("main");
+  if(m && !m.innerHTML.trim()){
+    m.innerHTML = `<div class="card" style="margin-top:20px">
+      <h2>⚠ Lỗi ứng dụng</h2>
+      <div class="hint warn">${msg}<br><small>${src}:${line}</small></div>
+      <button class="btn-primary" style="margin-top:12px" onclick="location.reload()">Tải lại trang</button>
+    </div>`;
+  }
+  console.error("App error:", msg, src, line, col, err);
+};
+window.addEventListener("unhandledrejection", ev=>{
+  console.error("Unhandled promise rejection:", ev.reason);
+});
+const L={
+steps:["Vấn đề","Mục tiêu","Phương án","Hệ quả","Chấm điểm","Kết quả","Hoán đổi","Rủi ro & Tương lai","Bẫy tâm lý","Tóm tắt"],
+traps:[
+["Bẫy mỏ neo","Nếu bắt đầu từ một con số hay ý tưởng khác, liệu mình có nghĩ khác không?"],
+["Bẫy giữ nguyên hiện trạng","Nếu tình trạng hiện tại KHÔNG phải là của mình, liệu mình có chọn nó không?"],
+["Bẫy chi phí chìm","Nếu những chi phí đã bỏ ra trước đây là miễn phí, liệu mình có vẫn chọn phương án này?"],
+["Bẫy bằng chứng xác nhận","Mình đã xây dựng lập luận MẠNH NHẤT để phản bác phương án mình thích chưa?"],
+["Bẫy đóng khung","Mình đã thử diễn đạt lại vấn đề theo cả hướng ĐƯỢC và MẤT chưa?"],
+["Bẫy quá tự tin","Mình đã hình dung kịch bản tốt nhất và xấu nhất một cách thực sự cực đoan chưa?"],
+["Bẫy dễ hồi tưởng","Mình đang đánh giá xác suất dựa trên số liệu thống kê hay chỉ dựa vào những câu chuyện ấn tượng?"],
+["Bỏ qua tỷ lệ cơ sở","Trước khi xét trường hợp cụ thể này, những con số thống kê chung nói lên điều gì?"],
+["Bẫy thận trọng quá mức","Mình đã ước lượng trung thực, và chỉ cộng biên độ an toàn MỘT lần, một cách rõ ràng chưa?"],
+["Bẫy đoán mò sự ngẫu nhiên","Ở đây có cơ chế nhân quả thật sự, hay mình đang tự kể chuyện từ sự ngẫu nhiên?"]],
+untitled:"Quyết định chưa đặt tên",
+meta:(d,n)=>`Bước ${Math.min(d.step+1,n)}/${n} · ${d.alternatives.length} phương án · bắt đầu ${new Date(d.createdAt).toLocaleDateString('vi-VN')}`,
+dateStr:()=>new Date().toLocaleDateString('vi-VN'),
+modeQuick:"⚡ Nhanh",modeFull:"Phân tích đầy đủ",
+modeQuickHint:"6 bước gọn nhẹ cho lựa chọn hằng ngày — chuyển đổi bất cứ lúc nào.",
+modeFullHint:"Đủ 10 bước theo phương pháp của cuốn sách.",
+unsaved:"⚠ Chưa xuất dữ liệu",exported:"✓ Đã sao lưu",
+restoreBanner:"Trình duyệt này chưa có quyết định nào được lưu. Nếu trình duyệt xóa dữ liệu khi đóng, hãy khôi phục bản sao lưu mới nhất (VD: từ OneDrive):",
+restoreBtn:"Khôi phục từ bản sao lưu",
+homeH1:"Các quyết định của bạn",
+btnExport:"Xuất dữ liệu",btnImport:"Nhập dữ liệu",btnNew:"+ Quyết định mới",
+btnOpen:"Mở",btnDelete:"Xóa",btnAdd:"Thêm",btnEdit:"Sửa",
+btnBack:"← Quay lại",btnNext:"Tiếp theo →",btnFinish:"Hoàn tất →",
+empty:"Chưa có quyết định nào. Hãy bắt đầu — trợ lý sẽ hướng dẫn bạn qua tám yếu tố PrOACT từng bước một, và mọi thứ bạn nhập đều được tự động đồng bộ lên đám mây.",
+confirmDel:"Xóa quyết định này?",
+impOk:(a,u)=>`Nhập hoàn tất: đã thêm ${a} quyết định, cập nhật ${u} quyết định.`,
+impBad:"Tệp này không phải là bản sao lưu của Lựa Chọn Thông Minh. Vui lòng chọn tệp .json mà bạn đã xuất trước đó.",
+exportPrefix:"lua-chon-thong-minh-sao-luu",
+p:{h:"Xác định đúng vấn đề",
+subQuick:"Với lựa chọn hằng ngày, một câu rõ ràng là đủ. Các câu hỏi đặt vấn đề sâu hơn nằm ở chế độ Phân tích đầy đủ.",
+sub:"Cách bạn đặt vấn đề sẽ quyết định những lựa chọn mà bạn cân nhắc. Hãy viết lại nó qua ba lần.",
+lName:"Đặt tên cho quyết định này",phName:"VD: Nên nhận lời mời làm việc nào",
+lInit:"Bản nháp đầu tiên — bạn nghĩ mình đang quyết định điều gì?",phInit:"Mình nên chọn công ty A hay công ty B?",
+lTrig:"Điều gì khiến bạn phải quyết định? Tại sao lại là lúc này?",phTrig:"Chuyện gì đã xảy ra khiến bạn phải đối mặt với quyết định này?",
+lBroad:"Diễn đạt lại rộng hơn — câu hỏi thực sự là gì?",phBroad:"VD: Mình muốn sự nghiệp và cuộc sống gia đình trong ba năm tới trông như thế nào?",
+hint:"Hãy nghi ngờ các ràng buộc — nhiều ràng buộc là do bạn tự đặt ra. \"Sửa nhà hay chuyển nhà?\" có thể trở thành \"Làm thế nào để tạo dựng cuộc sống gia đình mà mình mong muốn?\" Đặt vấn đề rộng hơn sẽ mở ra những phương án tốt hơn."},
+o:{h:"Làm rõ mục tiêu của bạn",
+sub:"Liệt kê những điều bạn thực sự muốn đạt được — rồi kéo thanh trượt để đánh trọng số mức độ quan trọng (1–10). Kiểm tra từng mục tiêu: tại sao điều này quan trọng? Nếu câu trả lời là \"vì nó giúp mình đạt được X\", hãy thêm X vào thay thế.",
+ph:"VD: Tối đa hóa thời gian dành cho gia đình",
+hintEmpty:"Bắt đầu bằng cách viết ra mọi mối bận tâm, rồi chuyển mỗi mối bận tâm thành một mục tiêu ngắn gọn dạng \"động từ + đối tượng\".",
+hintMany:"Cuốn sách khuyên chỉ nên có 5–7 mục tiêu cốt lõi. Nhiều hơn thường có nghĩa là một số mục chỉ là phương tiện chứ không phải mục đích — hãy thử gộp hoặc lược bớt."},
+a:{h:"Sáng tạo các phương án",
+sub:"Quyết định của bạn không thể tốt hơn phương án tốt nhất mà bạn có. Sáng tạo trước, đánh giá sau — việc chấm điểm được cố ý ẩn đi cho đến các bước sau.",
+ph:"VD: Nhận việc ở công ty A nhưng thương lượng làm việc từ xa",
+hint:"Gợi ý tìm phương án: với mỗi mục tiêu hãy hỏi \"LÀM THẾ NÀO để đạt được điều này?\" · Thử phá bỏ một ràng buộc bạn vẫn mặc định · Kết hợp hai phương án thành một phương án lai · Thêm phương án \"thu thập thêm thông tin\" hoặc \"trì hoãn để có thời gian\" · Một người có khát vọng cao hơn sẽ làm gì?",
+hintOne:"Chỉ có một phương án đang hoạt động — như vậy chưa phải là một quyết định. Bẫy giữ nguyên hiện trạng rất thích thực đơn chỉ có một món. Hãy thêm ít nhất một phương án cạnh tranh thực sự.",
+elim:"Loại bỏ",restore:"Khôi phục"},
+c:{h:"Mô tả hệ quả bằng lời",
+sub:"Trước khi có bất kỳ con số nào: với mỗi phương án, hãy mô tả bằng lời xem nó đáp ứng từng mục tiêu tốt đến đâu. Hãy tưởng tượng mình đang sống trong tương lai đó. Đây là bảng hệ quả của cuốn sách — lời văn có trước, điểm số theo sau.",
+need:"Bạn cần ít nhất một mục tiêu và hai phương án đang hoạt động trước. Hãy quay lại và bổ sung.",
+thObj:"Mục tiêu",phCell:"Mô tả…",
+pasteHint:"💡 Mẹo nhanh: bạn có thể copy một bảng từ Claude, Excel, Google Sheets hoặc bất kỳ trang web nào rồi dán (Ctrl+V / ⌘V) thẳng vào ô đầu tiên bên trên — app sẽ tự nhận diện tiêu đề cột/hàng và chỉ điền phần dữ liệu. Nếu cách đó không ăn (ví dụ copy từ điện thoại không giữ được định dạng cột), hãy dùng nút \"Dán hàng loạt\" bên dưới bảng này.",
+hint:"Dùng cách diễn đạt nhất quán trên mỗi hàng để so sánh công bằng giữa các phương án. Nếu có thể, hãy \"dùng thử trước khi mua\" — lái thử xe, ghé thăm khu phố, trải nghiệm thử công việc."},
+s:{h:"Chuyển lời văn thành điểm số",
+sub:"Bây giờ hãy đánh giá mức độ mỗi phương án đáp ứng từng mục tiêu, từ 1 (kém) đến 10 (xuất sắc). Phần mô tả của bạn hiện ngay dưới mỗi ô — hãy chấm điểm dựa trên lời văn, đừng chấm theo cảm hứng.",
+need:"Bạn cần ít nhất một mục tiêu và hai phương án đang hoạt động trước khi chấm điểm. Hãy quay lại và bổ sung.",
+thObj:"Mục tiêu (trọng số)",
+hint:"Dùng chuẩn nhất quán trên mỗi hàng: điểm \"7\" về thời gian cho gia đình phải có ý nghĩa như nhau với mọi phương án."},
+r:{h:"Kết quả có trọng số",
+sub:"Tổng điểm = Σ (trọng số × điểm). Đừng để con số quyết định thay bạn — nếu thứ hạng làm bạn ngạc nhiên, chính sự ngạc nhiên đó là thông tin: có thể một trọng số hay điểm số chưa phản ánh đúng điều bạn thực sự coi trọng.",
+crossedNote:n=>`(Đã loại ${n} mục tiêu bị gạch bỏ khỏi phép tính.)`,
+need:"Hãy thêm và chấm điểm ít nhất hai phương án đang hoạt động để xem kết quả.",
+incomplete:"(chưa chấm đủ điểm)",pts:"điểm",
+domHead:"Phát hiện phương án bị áp đảo:",
+domMsg:(l,w)=>`"${l}" bị "${w}" áp đảo hoàn toàn`,
+domTail:" — bạn có thể yên tâm loại bỏ nó (bước 3, Loại bỏ).",
+closeMsg:(a,b)=>`"${a}" và "${b}" chênh lệch dưới 5% — một tình huống thực sự khó. Đây chính là lúc dùng bước 7 (Hoán đổi): đánh đổi từng mục tiêu một cho đến khi có người thắng rõ ràng.`,
+closeQuick:(a,b)=>`"${a}" và "${b}" chênh lệch dưới 5% — một tình huống thực sự khó. Quyết định này xứng đáng được phân tích sâu hơn: hãy chuyển sang Phân tích đầy đủ (đầu trang) và giải quyết bằng Hoán đổi ngang giá.`,
+leader:"Phương án dẫn đầu:"},
+w:{h:"Hoán đổi ngang giá — phương pháp đánh đổi của cuốn sách",
+sub:"Dành cho các tình huống sát nút giữa những phương án cuối cùng. Thay vì trọng số trừu tượng, bạn đánh đổi những lượng giá trị thật: điều chỉnh một phương án trên một mục tiêu và bù lại bằng một thay đổi có giá trị tương đương trên mục tiêu khác — cho đến khi các mục tiêu lần lượt bị triệt tiêu và người thắng lộ diện.",
+recipe:"Công thức: (1) Nếu một mục tiêu đã có hệ quả NGANG NHAU ở mọi phương án đang hoạt động, hãy gạch bỏ nó bên dưới — nó không thể ảnh hưởng đến lựa chọn. (2) Nếu chưa, hãy ghi lại một hoán đổi ở đây, áp dụng thay đổi điểm số ở bước 5, rồi gạch bỏ mục tiêu vừa được cân bằng. (3) Sau mỗi hoán đổi hãy kiểm tra bước 6 — có thể xuất hiện áp đảo mới; loại bỏ phương án thua ở bước 3. Làm những hoán đổi DỄ trước, và định giá LƯỢNG thực tế đang đánh đổi, chứ không phải mức độ quan trọng trừu tượng.",
+refHead:"Điểm số hiện tại (để tham khảo)",
+objHead:"Gạch bỏ những mục tiêu không còn ý nghĩa",
+cross:"Gạch bỏ",uncross:"Khôi phục",
+logHead:"Ghi lại một hoán đổi",
+selObj:"— mục tiêu —",selAlt:"— phương án —",
+phGive:"Đánh đổi… (VD: 1 điểm chi phí ≈ 50 triệu)",
+phGet:"Nhận lại… (VD: nhiên liệu 7 → 9)",
+phNote:"Ghi chú (không bắt buộc)",
+btnAdd:"Thêm hoán đổi",give:"đánh đổi",get:"nhận lại",
+emptyLog:"Chưa có hoán đổi nào."},
+k:{h:"Bất định, mức chịu rủi ro & quyết định liên kết",
+sub:"Bạn không thể loại bỏ sự bất định — nhưng bạn có thể quyết định với đôi mắt mở to: liệt kê những gì có thể xảy ra, kiểm tra xem mình có sống được với kịch bản xấu nhất không, và ghi lại cách lựa chọn hôm nay định hình các lựa chọn ngày mai.",
+aHead:"A. Hồ sơ rủi ro — điều gì có thể xảy ra?",
+u:"Điều bất định",out:"Kết cục có thể xảy ra",prob:"Khả năng",cons:"Hậu quả nếu xảy ra",
+hedge:"Cách giảm thiểu / phòng ngừa / bảo hiểm",
+pH:"Cao",pM:"Trung bình",pL:"Thấp",
+btnAddRisk:"+ Thêm điều bất định",
+bHead:"B. Mức chịu rủi ro — hãy trả lời thành thật",
+q1:"Nếu kịch bản xấu nhất của phương án dẫn đầu xảy ra, mình có thực sự sống được với nó không?",
+q2:"Mình đang chấp nhận rủi ro này một cách có chủ đích — hay đang né tránh rủi ro chỉ vì sự thoải mái (lực hút của hiện trạng)?",
+q3:"Với những xác suất này, phần được có xứng đáng với phần mất không?",
+cHead:"C. Quyết định liên kết — lựa chọn này ảnh hưởng gì về sau?",
+fut:"Quyết định tương lai bị ảnh hưởng",how:"Lựa chọn này ràng buộc hay mở đường cho nó thế nào",wide:"Cách giữ cho lựa chọn tương lai rộng mở ngay từ bây giờ",
+btnAddLinked:"+ Thêm quyết định liên kết"},
+t:{h:"Kiểm tra bẫy tâm lý trước khi cam kết",
+sub:"Những cái bẫy tư duy này nguy hiểm vì chúng vô hình. Chỉ đánh dấu mỗi mục sau khi bạn đã thành thật tự hỏi mình câu hỏi tương ứng.",
+checked:(n,tot)=>`Đã kiểm tra ${n}/${tot} ${n===tot?"— biết trước là đã phòng bị.":""}`},
+y:{h:"Quyết định của bạn, gói gọn trong một trang",
+sub:"Sao chép nội dung này vào nhật ký quyết định của bạn — rồi đặt ngày xem lại, và vài tháng sau hãy tự chấm điểm QUY TRÌNH ra quyết định chứ không chỉ kết quả. Một quyết định tốt không bảo đảm kết quả tốt, nhưng về lâu dài, may mắn nghiêng về những người biết cách quyết định.",
+eyebrow:"Phương án dẫn đầu",copy:"Sao chép tóm tắt",copied:"Đã sao chép ✓",
+txt:{dec:"QUYẾT ĐỊNH",prob:"Vấn đề",obj:"Mục tiêu (trọng số)",rank:"Xếp hạng",
+incomplete:"[chưa chấm đủ]",crossedMark:"[đã gạch bỏ]",lead:"Phương án dẫn đầu",
+swaps:"Các hoán đổi đã thực hiện",risks:"Rủi ro chính & cách phòng ngừa",linked:"Quyết định liên kết",
+traps:"Bẫy tâm lý đã kiểm tra",date:"Ngày"}},
+bulk:{toggle:"Dán hàng loạt",
+instructions:"Dán vào đây nội dung bạn đã copy (từ Excel, Google Sheets, hoặc một bảng bất kỳ, kể cả bảng trong câu trả lời của Claude). Điền theo đúng thứ tự: mỗi DÒNG = 1 mục tiêu (theo đúng thứ tự trong bảng phía trên), các cột trong dòng cách nhau bằng Tab, dấu \"|\", hoặc ít nhất 2 khoảng trắng — ứng với đúng thứ tự các phương án.",
+ph:"VD:\nThanh toán xong chi phí nhà ở\tNhà đã trả hết nợ...\tGiữ nguyên...\tCó thêm REIT...\nGiảm giờ làm\tNghỉ hẳn ngay...\tVẫn làm bán thời gian...\t...",
+apply:"Áp dụng",cancel:"Hủy",
+applied:(n)=>`Đã điền ${n} ô.`,empty:"Không đọc được nội dung nào, hãy kiểm tra lại định dạng."}
+};
+const TRAPS=L.traps;
+const FULL_KEYS=["problem","objectives","alternatives","cons","score","results","swaps","risk","traps","summary"];
+const QUICK_KEYS=["problem","objectives","alternatives","score","results","summary"];
+const keysFor=d=>d.mode==="quick"?QUICK_KEYS:FULL_KEYS;
+const stepName=k=>L.steps[FULL_KEYS.indexOf(k)];
+const uid = () => Math.random().toString(36).slice(2,9);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Parse an HTML string from the clipboard and extract the first <table> as a 2D grid.
+// Tries multiple strategies: standard <table>, aria role-based tables, and <tr>/<td> fragments.
+function parseHTMLTable(html){
+  if(!html) return [];
+  try {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+
+    // Strategy 1: Standard <table> element
+    const table = div.querySelector("table");
+    if(table){
+      const grid = [];
+      for(const tr of table.rows){
+        const row = [];
+        for(const cell of tr.cells) row.push((cell.textContent||"").trim());
+        if(row.length) grid.push(row);
+      }
+      if(grid.length && grid[0].length>1) return grid;
+    }
+
+    // Strategy 2: Aria role-based tables (role="table" / role="grid")
+    const roleTable = div.querySelector('[role="table"],[role="grid"]');
+    if(roleTable){
+      const grid = [];
+      for(const tr of roleTable.querySelectorAll('[role="row"]')){
+        const row = [];
+        for(const cell of tr.querySelectorAll('[role="cell"],[role="gridcell"],[role="columnheader"],[role="rowheader"]'))
+          row.push((cell.textContent||"").trim());
+        if(row.length) grid.push(row);
+      }
+      if(grid.length && grid[0].length>1) return grid;
+    }
+
+    // Strategy 3: Loose <tr>/<td> without a wrapping <table>
+    const trs = div.querySelectorAll("tr");
+    if(trs.length>1){
+      const grid = [];
+      for(const tr of trs){
+        const row = [];
+        for(const cell of tr.querySelectorAll("th, td")) row.push((cell.textContent||"").trim());
+        if(row.length) grid.push(row);
+      }
+      if(grid.length && grid[0].length>1) return grid;
+    }
+
+    return [];
+  } catch(e){ return []; }
+}
+
+// Parse a concatenated text blob (no delimiters) by matching the known objective names
+// in the decision as row markers, then splitting cells within each row using the
+// no-space uppercase-letter heuristic (browsers drop spaces between adjacent <td> cells).
+function parseConcatenatedBlob(text, d){
+  if(!text || !d) return [];
+  const alts = d.alternatives.filter(a=>!a.eliminated);
+  const objs = d.objectives;
+  const N = alts.length;
+  if(N<2 || objs.length<1) return [];
+
+  // Step 1: find each objective name in the blob (with fuzzy/prefix matching)
+  const found = [];
+  for(let oi=0; oi<objs.length; oi++){
+    const name = objs[oi].name;
+    if(!name) continue;
+    let idx = text.indexOf(name);
+    let mLen = name.length;
+    // If exact match fails, try shorter versions
+    if(idx<0){
+      // Strip parenthetical suffix: "Nhà ở (bảo trì…)" → "Nhà ở"
+      const stripped = name.replace(/\s*[\(\[（].*$/, "").trim();
+      if(stripped.length>=8 && stripped!==name){
+        idx = text.indexOf(stripped);
+        if(idx>=0) mLen = stripped.length;
+      }
+    }
+    if(idx<0){
+      // Try first 25/20/15 chars as prefix
+      for(const n of [25,20,15]){
+        if(name.length<n) continue;
+        const pref = name.substring(0,n);
+        idx = text.indexOf(pref);
+        if(idx>=0){ mLen=pref.length; break; }
+      }
+    }
+    if(idx>=0) found.push({oi, start:idx, end:idx+mLen});
+  }
+  if(found.length<2) return [];
+  found.sort((a,b)=>a.start-b.start);
+
+  // Extend each match end to the actual objective boundary in the blob
+  // (find where the cell data begins by looking for the next cell-boundary-style transition)
+  for(let i=0; i<found.length; i++){
+    let e = found[i].end;
+    const limit = (i+1<found.length) ? found[i+1].start : text.length;
+    // Scan forward past any remaining objective-name text until we hit a cell boundary
+    // (a no-space uppercase transition that starts the first cell's content)
+    const sub = text.substring(e, Math.min(e+80, limit));
+    const bds = _findCellBoundaries(sub);
+    if(bds.length>0 && bds[0]<40) found[i].end = e + bds[0];
+  }
+
+  // Step 2: extract each row's cell blob (between end of obj name and start of next obj name or end)
+  const grid = [];
+  for(let i=0; i<found.length; i++){
+    const rowStart = found[i].end;
+    const rowEnd = (i+1<found.length) ? found[i+1].start : text.length;
+    const rowText = text.substring(rowStart, rowEnd);
+    const cells = _splitCellBlob(rowText, N);
+    grid.push(cells);
+  }
+  return grid;
+}
+
+// Parse a concatenated score blob like "...Nhà ở (9)8678Giảm giờ (8)10579..."
+// The pattern "(weight)digits" reliably marks each row's scores.
+// Splits concatenated digits into N valid scores (each 1–10) using backtracking.
+function parseScoreBlob(text, d){
+  if(!text || !d) return [];
+  const alts = d.alternatives.filter(a=>!a.eliminated);
+  const N = alts.length;
+  if(N<2 || d.objectives.length<1) return [];
+
+  // Find all "(weight)digits" patterns — weight is 1-10, followed by score digits
+  const pattern = /\((\d{1,2})\)(\d+)/g;
+  const matches = [...text.matchAll(pattern)];
+  if(matches.length<2) return [];
+
+  const grid = [];
+  for(const m of matches){
+    const digits = m[2];
+    const scores = _splitDigits(digits, N);
+    if(scores) grid.push(scores.map(String));
+    else grid.push([digits]); // fallback: put raw digits in first cell
+  }
+  return grid;
+}
+
+// Split a string of digits into exactly `n` numbers, each in 1–10.
+// Uses recursive backtracking (fast for small n).
+function _splitDigits(digits, n){
+  if(n===0) return digits==="" ? [] : null;
+  if(digits==="") return null;
+  // Try 1-digit number (1–9)
+  const one = parseInt(digits[0]);
+  if(one>=1 && one<=9){
+    const rest = _splitDigits(digits.substring(1), n-1);
+    if(rest!==null) return [one, ...rest];
+  }
+  // Try 2-digit number (only 10 is valid in 1–10 range)
+  if(digits.length>=2 && digits.substring(0,2)==="10"){
+    const rest = _splitDigits(digits.substring(2), n-1);
+    if(rest!==null) return [10, ...rest];
+  }
+  return null;
+}
+
+// Find all positions in `text` where adjacent characters indicate a cell boundary
+// created by the browser concatenating <td> textContent values (no space between cells).
+// Rule 1: lowercase/digit/punct char immediately followed by an uppercase letter.
+// Rule 2: uppercase char followed by uppercase char that starts a new word
+//         (i.e., text[i+1] is lowercase — distinguishes "APhải" from "ACA").
+function _findCellBoundaries(text){
+  const pts = [];
+  const lcRe = /[a-zàáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ0-9\)\]\.\,\;\:\!\?\…\"\'\'\"\u201D\u201C\u2014\u2013]/;
+  for(let i=1; i<text.length; i++){
+    const p = text[i-1], c = text[i];
+    if(/\s/.test(p) || /\s/.test(c)) continue;
+    // c must be uppercase
+    if(c !== c.toUpperCase() || c === c.toLowerCase()) continue;
+
+    // Rule 1: prev is lowercase/digit/closing-punct
+    if(lcRe.test(p)){
+      pts.push(i);
+      continue;
+    }
+    // Rule 2: prev is uppercase + next char (i+1) is a lowercase letter → new capitalized word
+    // (e.g. "APhải" = A + Phải, but NOT "ACA " where A is followed by space)
+    if(p === p.toUpperCase() && p !== p.toLowerCase() && i+1 < text.length){
+      const nx = text[i+1];
+      if(/[a-zàáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/.test(nx)){
+        pts.push(i);
+      }
+    }
+  }
+  return pts;
+}
+
+function _splitCellBlob(text, numCells){
+  if(numCells<=1 || !text) return [text||""];
+  const needed = numCells-1;
+  const candidates = _findCellBoundaries(text);
+  if(!candidates.length) return [text]; // can't split
+
+  // Perfect match
+  if(candidates.length===needed) return _splitAt(text,candidates);
+
+  // Not enough split points
+  if(candidates.length<needed) return [text];
+
+  // Too many candidates — pick the combination that creates the most balanced cell lengths.
+  // C(candidates, needed) is small for typical table sizes (≤ ~200 combos).
+  if(candidates.length<=20 && needed<=8){
+    const len = text.length;
+    const ideal = len/(needed+1);
+    let bestScore=Infinity, bestCombo=null;
+    const combo = new Array(needed);
+    (function pick(depth, start){
+      if(depth===needed){
+        let score=0, prev=0;
+        for(let k=0;k<needed;k++){ const cl=combo[k]-prev; score+=(cl-ideal)**2; prev=combo[k]; }
+        score+=(len-prev-ideal)**2;
+        if(score<bestScore){ bestScore=score; bestCombo=combo.slice(); }
+        return;
+      }
+      for(let i=start; i<=candidates.length-(needed-depth); i++){
+        combo[depth]=candidates[i];
+        pick(depth+1, i+1);
+      }
+    })(0,0);
+    if(bestCombo) return _splitAt(text, bestCombo);
+  }
+
+  // Fallback: evenly spaced
+  const step = candidates.length/needed;
+  const picked=[];
+  for(let i=0;i<needed;i++) picked.push(candidates[Math.round(i*step)]);
+  return _splitAt(text, picked);
+}
+
+function _splitAt(text, positions){
+  const cells=[]; let prev=0;
+  for(const p of positions){ cells.push(text.substring(prev,p).trim()); prev=p; }
+  cells.push(text.substring(prev).trim());
+  return cells;
+}
+
+// Parse text pasted/typed from Excel, Google Sheets, or a markdown table (e.g. copied
+// from a Claude chat reply) into a 2D grid of strings. Auto-detects the column
+// delimiter: real tabs first, then markdown "|" pipes, then runs of 2+ spaces.
+function parseGrid(text){
+  if(!text) return [];
+  let lines = text.replace(/\r\n?/g,"\n").split("\n");
+  // drop blank lines and markdown separator rows like "---|---|---" or ":--|:-:"
+  lines = lines.filter(l => l.trim()!=="" && !/^[\s|:\-]+$/.test(l));
+  if(!lines.length) return [];
+  const hasTab = lines.some(l=>l.includes("\t"));
+  const hasPipe = lines.some(l=>l.includes("|"));
+  return lines.map(line=>{
+    let cells;
+    if(hasTab){
+      cells = line.split("\t");
+    } else if(hasPipe){
+      cells = line.split("|");
+      // drop empty leading/trailing cell caused by a leading/trailing "|"
+      if(cells.length && cells[0].trim()==="") cells.shift();
+      if(cells.length && cells[cells.length-1].trim()==="") cells.pop();
+    } else {
+      cells = line.split(/ {2,}/);
+    }
+    return cells.map(c=>c.trim());
+  });
+}
+
+// Strip header row / label column if the pasted grid came from a full table (e.g. copied
+// from Claude's chat, a webpage, or any table that includes column headers and row labels).
+// Compares against the current decision's objective and alternative names.
+function smartStripGrid(grid, d){
+  if(!grid.length || !d) return grid;
+  const alts = d.alternatives.filter(a=>!a.eliminated);
+  const norm = s => (s||"").trim().toLowerCase().replace(/\s+/g," ");
+
+  // --- Detect header row (row 0 contains alternative names) ---
+  // Check if at least 2 cells in the first row fuzzy-match alternative names
+  let stripRow = false;
+  if(grid.length > 1){
+    const row0 = grid[0];
+    let altMatches = 0;
+    for(const cell of row0){
+      const cn = norm(cell);
+      if(!cn) continue;
+      for(const a of alts){
+        const an = norm(a.name);
+        // Match if one contains the other (handles truncation / prefix matching)
+        if(an && (cn.includes(an) || an.includes(cn))){ altMatches++; break; }
+      }
+    }
+    // Also detect generic header labels like "Mục tiêu", "Objective", etc.
+    const first0 = norm(row0[0]);
+    const genericHeaders = ["mục tiêu","objective","objectives","criteria","tiêu chí"];
+    if(genericHeaders.includes(first0)) altMatches++;
+    if(altMatches >= 2) stripRow = true;
+  }
+
+  // --- Detect label column (column 0 contains objective names) ---
+  let stripCol = false;
+  const startRow = stripRow ? 1 : 0;
+  if(grid[0] && grid[0].length > 1){
+    let objMatches = 0;
+    let rowsChecked = 0;
+    for(let ri = startRow; ri < grid.length; ri++){
+      const cn = norm(grid[ri][0]);
+      if(!cn) continue;
+      rowsChecked++;
+      for(const o of d.objectives){
+        const on = norm(o.name);
+        if(on && (cn.includes(on) || on.includes(cn))){ objMatches++; break; }
+      }
+    }
+    // If most rows' first cell matches an objective name, strip the column
+    if(rowsChecked > 0 && objMatches >= Math.min(rowsChecked, 2)) stripCol = true;
+  }
+
+  // Apply stripping
+  let result = grid;
+  if(stripRow) result = result.slice(1);
+  if(stripCol) result = result.map(row => row.slice(1));
+  return result;
+}
+
+// ---------- Firebase ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyCDtFwxXwHy1GsjH0JBW6irKLFBos-_bPQ",
+  authDomain: "lua-chon-thong-minh.firebaseapp.com",
+  databaseURL: "https://lua-chon-thong-minh-default-rtdb.firebaseio.com",
+  projectId: "lua-chon-thong-minh",
+  storageBucket: "lua-chon-thong-minh.firebasestorage.app",
+  messagingSenderId: "1042713564792",
+  appId: "1:1042713564792:web:91f83a8a143d00471abf8d",
+  measurementId: "G-XBE3KG9GYK"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // ensure auth survives page reload (mobile redirect flow)
+const rtdb = firebase.database();
+
+let unsubscribe = null; // database listener ref
+let syncStatus = "ok";
+
+function setSyncBadge(status, text){
+  syncStatus = status;
+  const el = document.getElementById("sync-badge");
+  if(!el) return;
+  el.style.display = "";
+  el.className = `sync-badge sync-${status}`;
+  el.textContent = text;
+}
+
+function decisionsRef(){
+  const u = auth.currentUser;
+  if(!u) return null;
+  return rtdb.ref("users/" + u.uid + "/decisions");
+}
+
+// ---------- persistence ----------
+function normalize(d){
+  d.mode = d.mode || "full";
+  d.step = d.step || 0;
+  d.name = d.name ?? "";
+  d.problem = d.problem || {initial:"",trigger:"",broader:""};
+  d.problem.initial = d.problem.initial ?? "";
+  d.problem.trigger = d.problem.trigger ?? "";
+  d.problem.broader = d.problem.broader ?? "";
+  d.objectives = Array.isArray(d.objectives) ? d.objectives : [];
+  d.alternatives = Array.isArray(d.alternatives) ? d.alternatives : [];
+  d.scores = d.scores || {};
+  d.cons = d.cons || {};
+  d.traps = d.traps || {};
+  d.swaps = Array.isArray(d.swaps) ? d.swaps : [];
+  d.risks = Array.isArray(d.risks) ? d.risks : [];
+  d.riskTol = d.riskTol || {q1:"",q2:"",q3:""};
+  d.linked = Array.isArray(d.linked) ? d.linked : [];
+  d.textareaHeights = d.textareaHeights || {};
+  d.objectives.forEach(o=>{ if(o.crossed===undefined) o.crossed=false; });
+  return d;
+}
+
+function persist(){
+  dirty = true;
+  const d = active();
+  if(!d) return;
+  const ref = decisionsRef();
+  if(!ref) return;
+  setSyncBadge("saving","Đang lưu…");
+  // Clean undefined values (Realtime DB doesn't accept undefined)
+  // Strip textareaHeights — they're device-specific and cause a render loop via the ResizeObserver
+  const clean = JSON.parse(JSON.stringify(d));
+  delete clean.textareaHeights;
+  ref.child(d.id).set(clean)
+    .then(()=> setSyncBadge("ok","✓ Đã đồng bộ"))
+    .catch(e=>{ console.error("persist error:", e.code, e.message); setSyncBadge("off","✗ Lỗi lưu"); });
+}
+
+// Debounced persist — for text typing so Firebase writes don't interrupt the user
+let _persistTimer = null;
+function persistSoon(){
+  dirty = true;
+  setSyncBadge("saving","…");
+  clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(persist, 600);
+}
+
+function persistAll(){
+  const ref = decisionsRef();
+  if(!ref) return;
+  const obj = {};
+  state.decisions.forEach(d=>{
+    const clean = JSON.parse(JSON.stringify(d));
+    delete clean.textareaHeights;
+    obj[d.id] = clean;
+  });
+  setSyncBadge("saving","Đang lưu…");
+  ref.set(obj)
+    .then(()=> setSyncBadge("ok","✓ Đã đồng bộ"))
+    .catch(e=>{ console.error("persistAll error:", e.code, e.message); setSyncBadge("off","✗ Lỗi lưu"); });
+}
+
+function deleteDecision(id){
+  const ref = decisionsRef();
+  if(!ref) return Promise.resolve();
+  return ref.child(id).remove()
+    .then(()=> setSyncBadge("ok","✓ Đã đồng bộ"))
+    .catch(e=>{ console.error("delete error:", e.code, e.message); setSyncBadge("off","✗ Lỗi xóa"); });
+}
+
+// Check if user is actively typing in a text field inside main
+function isUserTyping(){
+  const ae = document.activeElement;
+  return ae && main.contains(ae) &&
+    (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['checkbox','range','file'].includes(ae.type)));
+}
+
+let _listeningRef = null;
+function startListening(){
+  if(unsubscribe && _listeningRef){ _listeningRef.off("value", unsubscribe); }
+  _listeningRef = decisionsRef();
+  if(!_listeningRef) return;
+  let lastJson = "";
+  unsubscribe = _listeningRef.on("value", snap=>{
+    const data = snap.val() || {};
+    const incoming = Object.values(data).map(normalize)
+      .sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    const incomingJson = JSON.stringify(incoming);
+    if(incomingJson === lastJson) return;
+    lastJson = incomingJson;
+    const currentActiveId = state.activeId;
+    state.decisions = incoming;
+    state.activeId = currentActiveId;
+    if(state.activeId && !state.decisions.find(d=>d.id===state.activeId)) state.activeId = null;
+    setSyncBadge("ok","✓ Đã đồng bộ");
+    // Don't re-render while user is typing — it would destroy cursor & focus
+    if(!isUserTyping()) render();
+  }, err=>{
+    console.error("Database listen error:", err);
+    setSyncBadge("off","✗ Mất kết nối");
+    main.innerHTML = `<div class="card" style="margin-top:20px">
+      <h2>⚠ Lỗi kết nối</h2>
+      <div class="hint warn">Không thể tải dữ liệu: ${esc(err.message||err.code||"unknown")}.<br>Hãy tải lại trang hoặc kiểm tra kết nối mạng.</div>
+      <button class="btn-primary" style="margin-top:12px" onclick="location.reload()">Tải lại trang</button>
+    </div>`;
+  });
+}
+
+let state = { decisions: [], activeId: null };
+let editing = null;
+let dirty = false;
+const active = () => state.decisions.find(d => d.id === state.activeId) || null;
+
+function blank(){
+  return normalize({ id: uid(), name:"", createdAt: new Date().toISOString(), step:0, mode:"quick",
+    problem:{initial:"",trigger:"",broader:""}, objectives:[], alternatives:[], scores:{}, traps:{} });
+}
+
+// ---------- results math (crossed-out objectives are excluded) ----------
+function compute(d){
+  const alts = d.alternatives.filter(a=>!a.eliminated);
+  const objs = d.objectives.filter(o=>!o.crossed);
+  const maxTotal = objs.reduce((s,o)=>s+o.weight*10,0);
+  const rows = alts.map(a=>{
+    const sc = d.scores[a.id]||{};
+    const complete = objs.length>0 && objs.every(o=>sc[o.id]!==undefined && sc[o.id]!=="");
+    const total = objs.reduce((s,o)=>s+o.weight*(+sc[o.id]||0),0);
+    return {alt:a,total,complete,pct:maxTotal?total/maxTotal:0};
+  }).sort((x,y)=>y.total-x.total);
+  const dominated=[];
+  const scored=rows.filter(r=>r.complete);
+  for(const b of scored){
+    for(const a of scored){
+      if(a===b)continue;
+      const sa=d.scores[a.alt.id],sb=d.scores[b.alt.id];
+      const ge=objs.every(o=>+sa[o.id]>=+sb[o.id]);
+      const gt=objs.some(o=>+sa[o.id]>+sb[o.id]);
+      if(ge&&gt){dominated.push({loser:b.alt.name,winner:a.alt.name});break;}
+    }
+  }
+  return {rows,dominated};
+}
+
+// ---------- rendering ----------
+const main = document.getElementById("main");
+const backBtn = document.getElementById("back-btn");
+backBtn.onclick = () => { state.activeId=null; render(); };
+
+function render(){
+  try {
+    backBtn.style.display = state.activeId ? "" : "none";
+    const d = state.activeId ? active() : null;
+    if(state.activeId && !d){ state.activeId = null; }  // decision not found, go home
+    main.innerHTML = d ? wizardHTML(d) : homeHTML();
+    bind();
+    window.scrollTo(0,0);
+  } catch(err) {
+    console.error("Render error:", err);
+    main.innerHTML = `<div class="card" style="margin-top:20px">
+      <h2>⚠ Lỗi hiển thị</h2>
+      <div class="hint warn">${esc(err.message)}</div>
+      <button class="btn-primary" style="margin-top:12px" onclick="state.activeId=null;render();">Quay về trang chủ</button>
+    </div>`;
+  }
+}
+
+function homeHTML(){
+  const list = state.decisions.map(d=>`
+    <div class="row-card">
+      <div style="min-width:0">
+        <div class="serif" style="font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${esc(d.name||d.problem.initial||L.untitled)}</div>
+        <div class="muted">${L.meta(d, keysFor(d).length)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn-outline btn-small" data-open="${d.id}">${L.btnOpen}</button>
+        <button class="btn-subtle btn-small" data-del="${d.id}">${L.btnDelete}</button>
+      </div>
+    </div>`).join("");
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <h1>${L.homeH1}</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn-subtle btn-small" id="export-btn" ${state.decisions.length?"":"disabled"}>${L.btnExport}</button>
+        <button class="btn-subtle btn-small" id="import-btn">${L.btnImport}</button>
+        <button class="btn-primary" id="new-btn">${L.btnNew}</button>
+      </div>
+      </div>
+    </div>
+    ${state.decisions.length? list : `<div class="card empty">${L.empty}</div>`}`;
+}
+
+function stepRail(d){
+  const keys=keysFor(d);
+  return `<div class="steps">${keys.map((k,i)=>
+    `<button class="step-pill ${i===d.step?'now':i<d.step?'done':''}" data-step="${i}">${i+1}. ${stepName(k)}</button>`).join("")}</div>`;
+}
+
+function wizardHTML(d){
+  const keys=keysFor(d);
+  if(d.step>keys.length-1)d.step=keys.length-1;
+  const BODIES={problem:problemHTML,objectives:objectivesHTML,alternatives:alternativesHTML,cons:consHTML,
+    score:scoreHTML,results:resultsHTML,swaps:swapsHTML,risk:riskHTML,traps:trapsHTML,summary:summaryHTML};
+  return `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <button class="step-pill ${d.mode==='quick'?'now':''}" data-mode="quick">${L.modeQuick}</button>
+      <button class="step-pill ${d.mode!=='quick'?'now':''}" data-mode="full">${L.modeFull}</button>
+      <span class="muted">${d.mode==='quick'?L.modeQuickHint:L.modeFullHint}</span>
+    </div>
+    ${stepRail(d)}
+    <div class="card">${BODIES[keys[d.step]](d)}</div>
+    <div class="nav">
+      <button class="btn-subtle" data-step="${d.step-1}" ${d.step===0?"disabled":""}>${L.btnBack}</button>
+      <button class="btn-primary" data-step="${d.step+1}" ${d.step===keys.length-1?"disabled":""}>
+        ${d.step===keys.length-2?L.btnFinish:L.btnNext}</button>
+    </div>`;
+}
+
+function problemHTML(d){
+  if(d.mode==="quick") return `
+    <h2>${L.p.h}</h2>
+    <div class="sub">${L.p.subQuick}</div>
+    <div class="label">${L.p.lName}</div>
+    <textarea rows="1" data-field="name" placeholder="${L.p.phName}">${esc(d.name)}</textarea>
+    <div class="label">${L.p.lInit}</div>
+    <textarea rows="2" data-field="problem.initial" placeholder="${L.p.phInit}">${esc(d.problem.initial)}</textarea>`;
+  return `
+    <h2>${L.p.h}</h2>
+    <div class="sub">${L.p.sub}</div>
+    <div class="label">${L.p.lName}</div>
+    <textarea rows="1" data-field="name" placeholder="${L.p.phName}">${esc(d.name)}</textarea>
+    <div class="label">${L.p.lInit}</div>
+    <textarea rows="2" data-field="problem.initial" placeholder="${L.p.phInit}">${esc(d.problem.initial)}</textarea>
+    <div class="label">${L.p.lTrig}</div>
+    <textarea rows="2" data-field="problem.trigger" placeholder="${L.p.phTrig}">${esc(d.problem.trigger)}</textarea>
+    <div class="label">${L.p.lBroad}</div>
+    <textarea rows="2" data-field="problem.broader" placeholder="${L.p.phBroad}">${esc(d.problem.broader)}</textarea>
+    <div class="hint">${L.p.hint}</div>`;
+}
+
+function objectivesHTML(d){
+  const rows = d.objectives.map((o,i)=>`
+    <div class="obj-row">
+      <div class="move-group">
+        <button class="move-btn" data-move-obj-up="${o.id}" ${i===0?'disabled':''}title="Lên">▲</button>
+        <button class="move-btn" data-move-obj-down="${o.id}" ${i===d.objectives.length-1?'disabled':''}title="Xuống">▼</button>
+      </div>
+      ${editing==="obj|"+o.id
+        ?`<input type="text" class="edit-inline" id="edit-input" value="${esc(o.name)}">`
+        :`<div class="name">${esc(o.name)}</div>`}
+      <input type="range" min="1" max="10" value="${o.weight}" data-weight="${o.id}">
+      <div class="wt" id="wt-${o.id}">${o.weight}</div>
+      <button class="x-btn" data-edit="obj|${o.id}" title="${L.btnEdit}">✎</button>
+      <button class="x-btn" data-rm-obj="${o.id}">×</button>
+    </div>`).join("");
+  return `
+    <h2>${L.o.h}</h2>
+    <div class="sub">${L.o.sub}</div>
+    <div class="add-row">
+      <input type="text" id="obj-input" placeholder="${L.o.ph}">
+      <button class="btn-primary" id="obj-add">${L.btnAdd}</button>
+    </div>
+    <div style="margin-top:16px">${rows}</div>
+    ${d.objectives.length===0?`<div class="hint">${L.o.hintEmpty}</div>`:""}
+    ${d.objectives.length>7?`<div class="hint warn">${L.o.hintMany}</div>`:""}`;
+}
+
+function alternativesHTML(d){
+  const rows = d.alternatives.map((a,i)=>`
+    <div class="obj-row ${a.eliminated?'dim':''}">
+      <div class="move-group">
+        <button class="move-btn" data-move-alt-up="${a.id}" ${i===0?'disabled':''}title="Lên">▲</button>
+        <button class="move-btn" data-move-alt-down="${a.id}" ${i===d.alternatives.length-1?'disabled':''}title="Xuống">▼</button>
+      </div>
+      ${editing==="alt|"+a.id
+        ?`<input type="text" class="edit-inline" id="edit-input" value="${esc(a.name)}">`
+        :`<div class="name ${a.eliminated?'strike':''}">${esc(a.name)}</div>`}
+      <button class="x-btn" data-edit="alt|${a.id}" title="${L.btnEdit}">✎</button>
+      <button class="btn-subtle btn-small" data-tog-alt="${a.id}">${a.eliminated?L.a.restore:L.a.elim}</button>
+      <button class="x-btn" data-rm-alt="${a.id}">×</button>
+    </div>`).join("");
+  const live = d.alternatives.filter(a=>!a.eliminated).length;
+  return `
+    <h2>${L.a.h}</h2>
+    <div class="sub">${L.a.sub}</div>
+    <div class="add-row">
+      <input type="text" id="alt-input" placeholder="${L.a.ph}">
+      <button class="btn-primary" id="alt-add">${L.btnAdd}</button>
+    </div>
+    <div style="margin-top:16px">${rows}</div>
+    <div class="hint">${L.a.hint}</div>
+    ${live===1?`<div class="hint warn">${L.a.hintOne}</div>`:""}`;
+}
+
+function consHTML(d){
+  const alts=d.alternatives.filter(a=>!a.eliminated);
+  if(d.objectives.length<1||alts.length<2)
+    return `<h2>${L.c.h}</h2><div class="hint warn">${L.c.need}</div>`;
+  const head = alts.map(a=>`<th class="alt">${esc(a.name)}</th>`).join("");
+  const body = d.objectives.map(o=>`
+    <tr><td>${esc(o.name)}</td>
+    ${alts.map(a=>{
+      const v=d.cons[a.id]?.[o.id]||"";
+      return `<td class="cons-cell"><textarea rows="2" data-cons="${a.id}|${o.id}" placeholder="${L.c.phCell}">${esc(v)}</textarea></td>`;
+    }).join("")}</tr>`).join("");
+  return `
+    <h2>${L.c.h}</h2>
+    <div class="sub">${L.c.sub}</div>
+    <div class="table-wrap"><table><thead><tr><th>${L.c.thObj}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    <div class="hint good">${L.c.pasteHint}</div>
+    <button class="btn-outline btn-small" data-bulk-toggle="cons" style="margin-top:4px">📋 ${L.bulk.toggle}</button>
+    <div id="bulk-panel-cons" class="bulk-panel" style="display:none;margin-top:10px">
+      <div class="label">${L.bulk.instructions}</div>
+      <textarea id="bulk-input-cons" rows="8" placeholder="${L.bulk.ph}"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn-primary btn-small" data-bulk-apply="cons">${L.bulk.apply}</button>
+        <button class="btn-subtle btn-small" data-bulk-cancel="cons">${L.bulk.cancel}</button>
+      </div>
+    </div>
+    <div class="hint">${L.c.hint}</div>`;
+}
+
+function scoreHTML(d){
+  const alts=d.alternatives.filter(a=>!a.eliminated);
+  if(d.objectives.length<1||alts.length<2)
+    return `<h2>${L.s.h}</h2><div class="hint warn">${L.s.need}</div>`;
+  const head = alts.map(a=>`<th class="alt">${esc(a.name)}</th>`).join("");
+  const body = d.objectives.map(o=>`
+    <tr class="${o.crossed?'dim':''}"><td class="${o.crossed?'strike':''}">${esc(o.name)} <span class="serif" style="color:var(--brass)">(${o.weight})</span></td>
+    ${alts.map(a=>{
+      const v=d.scores[a.id]?.[o.id];
+      const w=d.cons[a.id]?.[o.id]||"";
+      return `<td class="score"><input type="number" min="1" max="10" value="${v??""}" data-score="${a.id}|${o.id}">
+        ${w?`<div class="score-words">${esc(w)}</div>`:""}</td>`;
+    }).join("")}</tr>`).join("");
+  return `
+    <h2>${L.s.h}</h2>
+    <div class="sub">${L.s.sub}</div>
+    <div class="table-wrap"><table><thead><tr><th>${L.s.thObj}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    <div class="hint good">${L.c.pasteHint.replace("bảng này","bảng điểm này")}</div>
+    <button class="btn-outline btn-small" data-bulk-toggle="score" style="margin-top:4px">📋 ${L.bulk.toggle}</button>
+    <div id="bulk-panel-score" class="bulk-panel" style="display:none;margin-top:10px">
+      <div class="label">${L.bulk.instructions}</div>
+      <textarea id="bulk-input-score" rows="8" placeholder="${L.bulk.ph}"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn-primary btn-small" data-bulk-apply="score">${L.bulk.apply}</button>
+        <button class="btn-subtle btn-small" data-bulk-cancel="score">${L.bulk.cancel}</button>
+      </div>
+    </div>
+    <div class="hint">${L.s.hint}</div>`;
+}
+
+function resultsHTML(d){
+  const {rows,dominated}=compute(d);
+  if(rows.length<2) return `<h2>${L.r.h}</h2><div class="hint warn">${L.r.need}</div>`;
+  const bars=rows.map((r,i)=>`
+    <div style="margin-bottom:14px">
+      <div class="bar-head">
+        <span style="font-weight:${i===0?700:500}">${i+1}. ${esc(r.alt.name)}
+          ${r.complete?"":`<span style="color:var(--warn);font-size:12px">${L.r.incomplete}</span>`}</span>
+        <span class="serif" style="color:${i===0?'var(--brass)':'var(--ink-soft)'}">${r.total} ${L.r.pts} · ${Math.round(r.pct*100)}%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill ${i===0?'top':''}" style="width:${Math.round(r.pct*100)}%"></div></div>
+    </div>`).join("");
+  const close = rows.length>=2 && rows[0].total-rows[1].total <= 0.05*(rows[0].total||1);
+  const crossed=d.objectives.filter(o=>o.crossed).length;
+  return `
+    <h2>${L.r.h}</h2>
+    <div class="sub">${L.r.sub}${crossed?` ${L.r.crossedNote(crossed)}`:""}</div>
+    ${bars}
+    ${dominated.length?`<div class="hint good">${L.r.domHead} ${dominated.map(x=>L.r.domMsg(esc(x.loser),esc(x.winner))).join("; ")}${L.r.domTail}</div>`:""}
+    ${close?`<div class="hint warn">${(d.mode==="quick"?L.r.closeQuick:L.r.closeMsg)(esc(rows[0].alt.name),esc(rows[1].alt.name))}</div>`:""}
+    ${rows[0].complete?`<div class="serif" style="font-size:17px;margin-top:8px">${L.r.leader}
+      <span style="color:var(--brass)">${esc(rows[0].alt.name)}</span></div>`:""}`;
+}
+
+function swapsHTML(d){
+  const live=d.alternatives.filter(a=>!a.eliminated);
+  const refBody = d.objectives.map(o=>`
+    <tr class="${o.crossed?'dim':''}"><td class="${o.crossed?'strike':''}">${esc(o.name)}</td>
+    ${live.map(a=>`<td class="score ${o.crossed?'strike':''}">${d.scores[a.id]?.[o.id]??"—"}</td>`).join("")}</tr>`).join("");
+  const objList = d.objectives.map(o=>`
+    <div class="obj-row ${o.crossed?'dim':''}">
+      <div class="name ${o.crossed?'strike':''}">${esc(o.name)}</div>
+      <button class="btn-subtle btn-small" data-cross="${o.id}">${o.crossed?L.w.uncross:L.w.cross}</button>
+    </div>`).join("");
+  const objOpts = d.objectives.filter(o=>!o.crossed).map(o=>`<option>${esc(o.name)}</option>`).join("");
+  const altOpts = live.map(a=>`<option>${esc(a.name)}</option>`).join("");
+  const log = d.swaps.map(s=>`
+    <div class="obj-row">
+      <div class="name"><b>${esc(s.objective)}</b> — ${esc(s.altName)}<br>
+        <span class="muted">${L.w.give}: ${esc(s.give)} → ${L.w.get}: ${esc(s.get)}${s.note?` · ${esc(s.note)}`:""}</span></div>
+      <button class="x-btn" data-rm-swap="${s.id}">×</button>
+    </div>`).join("");
+  return `
+    <h2>${L.w.h}</h2>
+    <div class="sub">${L.w.sub}</div>
+    <div class="hint">${L.w.recipe}</div>
+    <h3>${L.w.refHead}</h3>
+    <div class="table-wrap"><table><thead><tr><th>${L.s.thObj}</th>${live.map(a=>`<th class="alt">${esc(a.name)}</th>`).join("")}</tr></thead><tbody>${refBody}</tbody></table></div>
+    <h3>${L.w.objHead}</h3>
+    ${objList}
+    <h3>${L.w.logHead}</h3>
+    <div class="grid2">
+      <select id="swap-obj"><option value="" selected disabled>${L.w.selObj}</option>${objOpts}</select>
+      <select id="swap-alt"><option value="" selected disabled>${L.w.selAlt}</option>${altOpts}</select>
+    </div>
+    <div class="grid2" style="margin-top:8px">
+      <input type="text" id="swap-give" placeholder="${L.w.phGive}">
+      <input type="text" id="swap-get" placeholder="${L.w.phGet}">
+    </div>
+    <div style="margin-top:8px"><input type="text" id="swap-note" placeholder="${L.w.phNote}"></div>
+    <div style="margin-top:10px"><button class="btn-primary" id="swap-add">${L.w.btnAdd}</button></div>
+    <div style="margin-top:14px">${log || `<div class="muted">${L.w.emptyLog}</div>`}</div>`;
+}
+
+function riskHTML(d){
+  const riskCards = d.risks.map(x=>`
+    <div class="mini-card">
+      <div class="grid2">
+        <div><div class="label">${L.k.u}</div><input type="text" value="${esc(x.u)}" data-risk="${x.id}|u"></div>
+        <div><div class="label">${L.k.out}</div><input type="text" value="${esc(x.out)}" data-risk="${x.id}|out"></div>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <div><div class="label">${L.k.prob}</div>
+          <select data-risk="${x.id}|prob">
+            <option value="H"${x.prob==="H"?" selected":""}>${L.k.pH}</option>
+            <option value="M"${x.prob==="M"?" selected":""}>${L.k.pM}</option>
+            <option value="L"${x.prob==="L"?" selected":""}>${L.k.pL}</option>
+          </select></div>
+        <div><div class="label">${L.k.cons}</div><input type="text" value="${esc(x.cons)}" data-risk="${x.id}|cons"></div>
+      </div>
+      <div style="margin-top:8px"><div class="label">${L.k.hedge}</div><input type="text" value="${esc(x.hedge)}" data-risk="${x.id}|hedge"></div>
+      <div style="text-align:right"><button class="x-btn" data-rm-risk="${x.id}">×</button></div>
+    </div>`).join("");
+  const linkedCards = d.linked.map(x=>`
+    <div class="mini-card">
+      <div class="label">${L.k.fut}</div><input type="text" value="${esc(x.fut)}" data-linked="${x.id}|fut">
+      <div class="label">${L.k.how}</div><input type="text" value="${esc(x.how)}" data-linked="${x.id}|how">
+      <div class="label">${L.k.wide}</div><input type="text" value="${esc(x.wide)}" data-linked="${x.id}|wide">
+      <div style="text-align:right"><button class="x-btn" data-rm-linked="${x.id}">×</button></div>
+    </div>`).join("");
+  return `
+    <h2>${L.k.h}</h2>
+    <div class="sub">${L.k.sub}</div>
+    <h3>${L.k.aHead}</h3>
+    ${riskCards}
+    <button class="btn-outline btn-small" id="risk-add">${L.k.btnAddRisk}</button>
+    <h3>${L.k.bHead}</h3>
+    <div class="label">${L.k.q1}</div><textarea rows="2" data-rtol="q1">${esc(d.riskTol.q1)}</textarea>
+    <div class="label">${L.k.q2}</div><textarea rows="2" data-rtol="q2">${esc(d.riskTol.q2)}</textarea>
+    <div class="label">${L.k.q3}</div><textarea rows="2" data-rtol="q3">${esc(d.riskTol.q3)}</textarea>
+    <h3>${L.k.cHead}</h3>
+    ${linkedCards}
+    <button class="btn-outline btn-small" id="linked-add">${L.k.btnAddLinked}</button>`;
+}
+
+function trapsHTML(d){
+  const items=TRAPS.map(([n,q])=>`
+    <label class="trap">
+      <input type="checkbox" ${d.traps[n]?"checked":""} data-trap="${esc(n)}">
+      <div><div class="t-name">${n}</div><div class="t-q">${q}</div></div>
+    </label>`).join("");
+  const n=TRAPS.filter(([t])=>d.traps[t]).length;
+  return `
+    <h2>${L.t.h}</h2>
+    <div class="sub">${L.t.sub}</div>
+    ${items}
+    <div class="serif" style="margin-top:14px;font-size:15px;color:${n===TRAPS.length?'var(--good)':'var(--ink-soft)'}">
+      ${L.t.checked(n,TRAPS.length)}</div>`;
+}
+
+function summaryText(d){
+  const {rows}=compute(d);
+  const crossed=d.objectives.filter(o=>o.crossed);
+  const lines=[
+    `${L.y.txt.dec}: ${d.name||d.problem.initial||L.untitled}`,
+    `${L.y.txt.prob}: ${d.problem.broader||d.problem.initial}`,``,
+    `${L.y.txt.obj}: ${d.objectives.map(o=>`${o.name} (${o.weight})${o.crossed?` ${L.y.txt.crossedMark}`:""}`).join("; ")}`,``,
+    `${L.y.txt.rank}:`,
+    ...rows.map((r,i)=>`  ${i+1}. ${r.alt.name} — ${r.total} ${L.r.pts} (${Math.round(r.pct*100)}%)${r.complete?"":` ${L.y.txt.incomplete}`}`),
+  ];
+  if(rows[0]) lines.push(``,`${L.y.txt.lead}: ${rows[0].alt.name}`);
+  if(d.swaps.length){
+    lines.push(``,`${L.y.txt.swaps}:`);
+    d.swaps.forEach(s=>lines.push(`  • ${s.objective} — ${s.altName}: ${s.give} → ${s.get}`));
+  }
+  if(d.risks.length){
+    lines.push(``,`${L.y.txt.risks}:`);
+    d.risks.forEach(x=>lines.push(`  • ${x.u} (${x.prob})${x.hedge?` — ${x.hedge}`:""}`));
+  }
+  if(d.linked.length){
+    lines.push(``,`${L.y.txt.linked}:`);
+    d.linked.forEach(x=>lines.push(`  • ${x.fut}${x.wide?` — ${x.wide}`:""}`));
+  }
+  lines.push(``,`${L.y.txt.traps}: ${TRAPS.filter(([n])=>d.traps[n]).length}/${TRAPS.length}`,
+    `${L.y.txt.date}: ${L.dateStr()}`);
+  return lines.join("\n");
+}
+
+function summaryHTML(d){
+  const {rows}=compute(d);
+  const top=rows[0];
+  return `
+    <h2>${L.y.h}</h2>
+    <div class="sub">${L.y.sub}</div>
+    ${top&&top.complete?`<div class="leader-box"><div class="leader-eyebrow">${L.y.eyebrow}</div>
+      <div class="leader-name">${esc(top.alt.name)}</div></div>`:""}
+    <textarea id="summary-text" rows="14" readonly onfocus="this.select()">${esc(summaryText(d))}</textarea>
+    <div style="margin-top:10px"><button class="btn-primary" id="copy-btn">${L.y.copy}</button></div>`;
+}
+
+// ---------- event delegation (mobile-safe: handlers live on main, survive DOM rebuilds) ----------
+// helper: find closest ancestor with a given data attribute
+const closest = (el, attr) => el.closest ? el.closest(`[data-${attr}]`) : null;
+const dataOf  = (el, attr) => closest(el, attr)?.dataset[attr.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())];
+
+// ---- CLICK delegation (one handler, never re-attached) ----
+main.addEventListener("click", ev => {
+  try {
+  const t = ev.target;
+  const d = active();
+
+  // --- Home screen ---
+  if(t.closest("#new-btn")){
+    const nd=blank(); state.decisions.unshift(nd); state.activeId=nd.id;
+    const ref = decisionsRef();
+    if(ref) ref.child(nd.id).set(JSON.parse(JSON.stringify(nd)))
+      .then(()=>setSyncBadge("ok","✓ Đã đồng bộ"))
+      .catch(e=>{console.error(e);setSyncBadge("off","✗ Lỗi lưu");});
+    render(); return;
+  }
+  if(t.closest("#export-btn") && state.decisions.length){
+    const blob=new Blob([JSON.stringify(state.decisions,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`${L.exportPrefix}-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href); return;
+  }
+  if(t.closest("#import-btn")){
+    document.getElementById("import-file")?.click(); return;
+  }
+  const openEl=t.closest("[data-open]");
+  if(openEl){ state.activeId=openEl.dataset.open; render(); return; }
+
+  const delEl=t.closest("[data-del]");
+  if(delEl){
+    if(confirm(L.confirmDel)){
+      const id=delEl.dataset.del;
+      state.decisions=state.decisions.filter(x=>x.id!==id);
+      deleteDecision(id); render();
+    } return;
+  }
+  if(!d) return;
+
+  // --- Wizard: step pills & nav ---
+  const stepEl=t.closest("[data-step]");
+  if(stepEl && !stepEl.disabled){
+    d.step=Math.max(0,Math.min(keysFor(d).length-1,+stepEl.dataset.step));
+    persist(); render(); return;
+  }
+  const modeEl=t.closest("[data-mode]");
+  if(modeEl){
+    const cur=keysFor(d)[d.step];
+    d.mode=modeEl.dataset.mode;
+    const nk=keysFor(d);
+    let i=nk.indexOf(cur); if(i<0)i=nk.indexOf("results");
+    d.step=Math.max(0,i); persist(); render(); return;
+  }
+
+  // --- Inline editing ---
+  const editEl=t.closest("[data-edit]");
+  if(editEl){ editing=editEl.dataset.edit; render(); return; }
+
+  // --- Objectives ---
+  if(t.closest("#obj-add")){ objAddFn(); return; }
+  const rmObj=t.closest("[data-rm-obj]");
+  if(rmObj){ d.objectives=d.objectives.filter(o=>o.id!==rmObj.dataset.rmObj); persist(); render(); return; }
+  const moveObjUp=t.closest("[data-move-obj-up]");
+  if(moveObjUp){ const id=moveObjUp.dataset.moveObjUp; const i=d.objectives.findIndex(o=>o.id===id); if(i>0){[d.objectives[i-1],d.objectives[i]]=[d.objectives[i],d.objectives[i-1]]; persist(); render();} return; }
+  const moveObjDown=t.closest("[data-move-obj-down]");
+  if(moveObjDown){ const id=moveObjDown.dataset.moveObjDown; const i=d.objectives.findIndex(o=>o.id===id); if(i>=0&&i<d.objectives.length-1){[d.objectives[i],d.objectives[i+1]]=[d.objectives[i+1],d.objectives[i]]; persist(); render();} return; }
+
+  // --- Alternatives ---
+  if(t.closest("#alt-add")){ altAddFn(); return; }
+  const moveAltUp=t.closest("[data-move-alt-up]");
+  if(moveAltUp){ const id=moveAltUp.dataset.moveAltUp; const i=d.alternatives.findIndex(a=>a.id===id); if(i>0){[d.alternatives[i-1],d.alternatives[i]]=[d.alternatives[i],d.alternatives[i-1]]; persist(); render();} return; }
+  const moveAltDown=t.closest("[data-move-alt-down]");
+  if(moveAltDown){ const id=moveAltDown.dataset.moveAltDown; const i=d.alternatives.findIndex(a=>a.id===id); if(i>=0&&i<d.alternatives.length-1){[d.alternatives[i],d.alternatives[i+1]]=[d.alternatives[i+1],d.alternatives[i]]; persist(); render();} return; }
+  const togAlt=t.closest("[data-tog-alt]");
+  if(togAlt){ const a=d.alternatives.find(x=>x.id===togAlt.dataset.togAlt); if(a){a.eliminated=!a.eliminated;} persist(); render(); return; }
+  const rmAlt=t.closest("[data-rm-alt]");
+  if(rmAlt){ const id=rmAlt.dataset.rmAlt; d.alternatives=d.alternatives.filter(a=>a.id!==id); delete d.scores[id]; delete d.cons[id]; persist(); render(); return; }
+
+  // --- Swaps ---
+  if(t.closest("#swap-add")){
+    const so=document.getElementById("swap-obj"),sa=document.getElementById("swap-alt");
+    const give=document.getElementById("swap-give")?.value.trim()||"";
+    const get_=document.getElementById("swap-get")?.value.trim()||"";
+    const note=document.getElementById("swap-note")?.value.trim()||"";
+    if(!so?.value||!sa?.value||(!give&&!get_))return;
+    d.swaps.push({id:uid(),objective:so.value,altName:sa.value,give,get:get_,note});
+    persist(); render(); return;
+  }
+  const rmSwap=t.closest("[data-rm-swap]");
+  if(rmSwap){ d.swaps=d.swaps.filter(s=>s.id!==rmSwap.dataset.rmSwap); persist(); render(); return; }
+  const crossEl=t.closest("[data-cross]");
+  if(crossEl){ const o=d.objectives.find(x=>x.id===crossEl.dataset.cross); if(o){o.crossed=!o.crossed;} persist(); render(); return; }
+
+  // --- Risks ---
+  if(t.closest("#risk-add")){ d.risks.push({id:uid(),u:"",out:"",prob:"M",cons:"",hedge:""}); persist(); render(); return; }
+  const rmRisk=t.closest("[data-rm-risk]");
+  if(rmRisk){ d.risks=d.risks.filter(x=>x.id!==rmRisk.dataset.rmRisk); persist(); render(); return; }
+
+  // --- Linked decisions ---
+  if(t.closest("#linked-add")){ d.linked.push({id:uid(),fut:"",how:"",wide:""}); persist(); render(); return; }
+  const rmLinked=t.closest("[data-rm-linked]");
+  if(rmLinked){ d.linked=d.linked.filter(x=>x.id!==rmLinked.dataset.rmLinked); persist(); render(); return; }
+
+  // --- Bulk paste (Hệ quả / Chấm điểm tables) ---
+  const bulkToggle=t.closest("[data-bulk-toggle]");
+  if(bulkToggle){
+    const kind=bulkToggle.dataset.bulkToggle;
+    const panel=document.getElementById(`bulk-panel-${kind}`);
+    if(panel) panel.style.display = (panel.style.display==="none"?"block":"none");
+    return;
+  }
+  const bulkCancel=t.closest("[data-bulk-cancel]");
+  if(bulkCancel){
+    const kind=bulkCancel.dataset.bulkCancel;
+    const panel=document.getElementById(`bulk-panel-${kind}`);
+    const input=document.getElementById(`bulk-input-${kind}`);
+    if(input) input.value="";
+    if(panel) panel.style.display="none";
+    return;
+  }
+  const bulkApply=t.closest("[data-bulk-apply]");
+  if(bulkApply){
+    const kind=bulkApply.dataset.bulkApply; // "cons" or "score"
+    const input=document.getElementById(`bulk-input-${kind}`);
+    const raw = input?.value||"";
+    let grid=parseGrid(raw);
+    // If parseGrid returns a single cell, try splitting the blob using known names
+    const isMulti = grid.length>1 || (grid[0] && grid[0].length>1);
+    if(!isMulti && d){
+      if(kind==="score") grid = parseScoreBlob(raw, d);
+      if(!grid.length) grid = parseConcatenatedBlob(raw, d);
+    }
+    if(!grid.length){ alert(L.bulk.empty); return; }
+    // Auto-strip header row / label column if pasted from a full table
+    grid = smartStripGrid(grid, d);
+    if(!grid.length){ alert(L.bulk.empty); return; }
+    const alts=d.alternatives.filter(a=>!a.eliminated);
+    let filled=0;
+    grid.forEach((row,ri)=>{
+      const obj=d.objectives[ri];
+      if(!obj) return;
+      row.forEach((raw,ci)=>{
+        const alt=alts[ci];
+        if(!alt) return;
+        const val=raw.trim();
+        if(kind==="cons"){
+          if(!d.cons[alt.id]) d.cons[alt.id]={};
+          d.cons[alt.id][obj.id]=val;
+        } else {
+          if(!d.scores[alt.id]) d.scores[alt.id]={};
+          if(val===""){ delete d.scores[alt.id][obj.id]; }
+          else { const n=Math.max(1,Math.min(10,+val||0)); d.scores[alt.id][obj.id]=n; }
+        }
+        filled++;
+      });
+    });
+    persist();
+    alert(filled ? L.bulk.applied(filled) : L.bulk.empty);
+    render();
+    return;
+  }
+
+  // --- Copy summary ---
+  if(t.closest("#copy-btn")){
+    const tx=document.getElementById("summary-text");
+    if(tx){
+      navigator.clipboard.writeText(tx.value).catch(()=>{tx.focus();tx.select();document.execCommand("copy");});
+      const btn=t.closest("#copy-btn"); btn.textContent=L.y.copied;
+      setTimeout(()=>{const b2=document.getElementById("copy-btn");if(b2)b2.textContent=L.y.copy;},1800);
+    }
+    return;
+  }
+  } catch(err){ console.error("Click handler error:", err); }
+});
+
+// ---- INPUT delegation (oninput for textareas, sliders, number inputs) ----
+main.addEventListener("input", ev => {
+  try {
+  const t = ev.target;
+  const d = active();
+  if(!d) return;
+
+  // text fields (problem, name)
+  if(t.dataset.field){
+    const path=t.dataset.field.split(".");
+    if(path.length===1) d[path[0]]=t.value; else d[path[0]][path[1]]=t.value;
+    persistSoon(); return;
+  }
+  // objective weight slider
+  if(t.dataset.weight){
+    const o=d.objectives.find(x=>x.id===t.dataset.weight);
+    if(o){ o.weight=+t.value; const wEl=document.getElementById("wt-"+o.id); if(wEl)wEl.textContent=t.value; persistSoon(); }
+    return;
+  }
+  // consequence textarea
+  if(t.dataset.cons){
+    const [altId,objId]=t.dataset.cons.split("|");
+    if(!d.cons[altId])d.cons[altId]={};
+    d.cons[altId][objId]=t.value; persistSoon(); return;
+  }
+  // score input
+  if(t.dataset.score){
+    const [altId,objId]=t.dataset.score.split("|");
+    if(!d.scores[altId])d.scores[altId]={};
+    const v=t.value==="" ? undefined : Math.max(1,Math.min(10,+t.value));
+    if(v===undefined) delete d.scores[altId][objId]; else d.scores[altId][objId]=v;
+    persistSoon(); return;
+  }
+  // risk fields
+  if(t.dataset.risk){
+    const [id,field]=t.dataset.risk.split("|");
+    const x=d.risks.find(r=>r.id===id); if(x){x[field]=t.value; persistSoon();} return;
+  }
+  // risk tolerance
+  if(t.dataset.rtol){
+    d.riskTol[t.dataset.rtol]=t.value; persistSoon(); return;
+  }
+  // linked decisions
+  if(t.dataset.linked){
+    const [id,field]=t.dataset.linked.split("|");
+    const x=d.linked.find(r=>r.id===id); if(x){x[field]=t.value; persistSoon();} return;
+  }
+  } catch(err){ console.error("Input handler error:", err); }
+});
+
+// ---- PASTE delegation: paste a whole grid (copied from Excel/Sheets/Docs)
+// into one cell of the "Hệ quả" or "Chấm điểm" tables and auto-fill the rest ----
+main.addEventListener("paste", ev => {
+  try {
+  const t = ev.target;
+  const isCons = !!(t.dataset && t.dataset.cons);
+  const isScore = !!(t.dataset && t.dataset.score);
+  if(!isCons && !isScore) return;
+
+  const clip = ev.clipboardData || window.clipboardData;
+  if(!clip) return;
+
+  const d = active();
+  if(!d) return;
+
+  // Try HTML first (preserves table structure from Claude chat / web pages)
+  const html = clip.getData("text/html");
+  let grid = parseHTMLTable(html);
+
+  // Fall back to plain text (Excel, Sheets, markdown, pipe-delimited)
+  if(!grid.length){
+    const text = clip.getData("text");
+    if(!text) return;
+    grid = parseGrid(text);
+
+    const isMultiCell = grid.length>1 || (grid[0] && grid[0].length>1);
+    if(!isMultiCell){
+      // Last resort: try parsing a concatenated blob using known objective/alt names
+      if(isScore) grid = parseScoreBlob(text, d);
+      if(!grid.length) grid = parseConcatenatedBlob(text, d);
+      if(!grid.length) return; // truly a single value — let normal paste happen
+    }
+  }
+
+  ev.preventDefault();
+
+  // Auto-strip header row / label column if pasted from a full table
+  grid = smartStripGrid(grid, d);
+  if(!grid.length) return;
+
+  const alts = d.alternatives.filter(a=>!a.eliminated);
+
+  const [startAltId, startObjId] = (isCons ? t.dataset.cons : t.dataset.score).split("|");
+  const altIdx0 = alts.findIndex(a=>a.id===startAltId);
+  const objIdx0 = d.objectives.findIndex(o=>o.id===startObjId);
+  if(altIdx0<0 || objIdx0<0) return;
+
+  let filled=0;
+  grid.forEach((row,ri)=>{
+    row.forEach((raw,ci)=>{
+      const obj = d.objectives[objIdx0+ri];
+      const alt = alts[altIdx0+ci];
+      if(!obj || !alt) return; // past edge of the table: ignore extra cells
+      const val = raw.trim();
+      if(isCons){
+        if(!d.cons[alt.id]) d.cons[alt.id]={};
+        d.cons[alt.id][obj.id] = val;
+      } else {
+        if(!d.scores[alt.id]) d.scores[alt.id]={};
+        if(val===""){ delete d.scores[alt.id][obj.id]; }
+        else { const n=Math.max(1,Math.min(10,+val||0)); d.scores[alt.id][obj.id]=n; }
+      }
+      filled++;
+    });
+  });
+  if(filled){ persistSoon(); render(); }
+  } catch(err){ console.error("Paste handler error:", err); }
+});
+
+// ---- Intercept paste on bulk-paste textareas: if clipboard has an HTML table
+// or a concatenated blob, convert it to tab-delimited text for parseGrid. ----
+main.addEventListener("paste", ev => {
+  const t = ev.target;
+  if(!t || !(t.id === "bulk-input-cons" || t.id === "bulk-input-score")) return;
+  const clip = ev.clipboardData || window.clipboardData;
+  if(!clip) return;
+
+  // Try HTML table first
+  const html = clip.getData("text/html");
+  let grid = parseHTMLTable(html);
+
+  // Try concatenated blob using known names
+  if(!grid.length){
+    const d = active();
+    if(d){
+      const text = clip.getData("text");
+      if(text){
+        if(t.id === "bulk-input-score") grid = parseScoreBlob(text, d);
+        if(!grid.length) grid = parseConcatenatedBlob(text, d);
+      }
+    }
+  }
+
+  if(grid.length > 0 && (grid.length > 1 || (grid[0] && grid[0].length > 1))){
+    // Strip header/label before converting to TSV
+    const d = active();
+    if(d) grid = smartStripGrid(grid, d);
+    ev.preventDefault();
+    const tsv = grid.map(row => row.join("\t")).join("\n");
+    const start = t.selectionStart, end = t.selectionEnd;
+    t.value = t.value.substring(0, start) + tsv + t.value.substring(end);
+    t.selectionStart = t.selectionEnd = start + tsv.length;
+    t.dispatchEvent(new Event("input", {bubbles:true}));
+  }
+}, true); // capture phase to run before the textarea's default paste
+
+// Flush debounced persist when user leaves a text field
+main.addEventListener("blur", ev => {
+  if(_persistTimer){
+    clearTimeout(_persistTimer);
+    _persistTimer = null;
+    persist();
+  }
+}, true);  // capture phase so it fires even if focus moves outside main
+
+// ---- CHANGE delegation (checkboxes, selects, file input) ----
+main.addEventListener("change", ev => {
+  try {
+  const t = ev.target;
+  const d = active();
+  if(!d) return;
+  // traps checkboxes
+  if(t.dataset.trap){
+    d.traps[t.dataset.trap]=t.checked; persist(); render(); return;
+  }
+  // risk probability select
+  if(t.dataset.risk){
+    const [id,field]=t.dataset.risk.split("|");
+    const x=d.risks.find(r=>r.id===id); if(x){x[field]=t.value; persist();}
+  }
+  } catch(err){ console.error("Change handler error:", err); }
+});
+
+// ---- KEYDOWN delegation (Enter to add objectives/alternatives) ----
+main.addEventListener("keydown", ev => {
+  const d = active();
+  if(!d || ev.key !== "Enter") return;
+  if(ev.target.id === "obj-input"){ objAddFn(); return; }
+  if(ev.target.id === "alt-input"){ altAddFn(); return; }
+});
+
+// Shared add functions (called from click AND keydown)
+function objAddFn(){
+  const d=active(); if(!d) return;
+  const inp=document.getElementById("obj-input"); const v=inp?.value.trim(); if(!v)return;
+  d.objectives.push({id:uid(),name:v,weight:5,crossed:false}); persist(); render();
+  document.getElementById("obj-input")?.focus();
+}
+function altAddFn(){
+  const d=active(); if(!d) return;
+  const inp=document.getElementById("alt-input"); const v=inp?.value.trim(); if(!v)return;
+  d.alternatives.push({id:uid(),name:v,eliminated:false}); persist(); render();
+  document.getElementById("alt-input")?.focus();
+}
+
+// ---- File import (on a hidden input outside dynamic content) ----
+document.getElementById("import-file")?.addEventListener("change",ev=>{
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      let incoming=JSON.parse(r.result);
+      // Accept Firebase Console export (object keyed by ID) — convert to array
+      if(incoming && typeof incoming==="object" && !Array.isArray(incoming)){
+        // Dig through nested wrappers: {"decisions":{...}} or {"users":{"uid":{"decisions":{...}}}}
+        let obj = incoming;
+        for(let depth=0; depth<4; depth++){
+          const vals = Object.values(obj);
+          if(vals.length && vals[0] && typeof vals[0]==="object" && vals[0].id) break;
+          if(vals.length>=1 && typeof vals[0]==="object" && !Array.isArray(vals[0])){
+            obj = vals[0];
+          } else break;
+        }
+        incoming = Object.values(obj).filter(v=>v && typeof v==="object");
+      }
+      if(!Array.isArray(incoming) || !incoming.length) throw new Error("bad format");
+      let added=0, updated=0;
+      for(const inc of incoming){
+        if(!inc || !inc.id) continue;
+        normalize(inc);
+        const i=state.decisions.findIndex(x=>x.id===inc.id);
+        if(i>=0){ state.decisions[i]=inc; updated++; }
+        else { state.decisions.push(inc); added++; }
+      }
+      persistAll(); render();
+      alert(L.impOk(added,updated));
+    }catch{ alert(L.impBad); }
+  };
+  r.readAsText(f); ev.target.value="";
+});
+
+// ---- Textarea height persistence ----
+// Build a unique key for a textarea from its data attributes
+function _taKey(ta){
+  if(ta.dataset.field) return "f:"+ta.dataset.field;
+  if(ta.dataset.cons) return "c:"+ta.dataset.cons;
+  if(ta.dataset.rtol) return "rt:"+ta.dataset.rtol;
+  if(ta.dataset.risk) return "rk:"+ta.dataset.risk;
+  if(ta.dataset.linked) return "ln:"+ta.dataset.linked;
+  if(ta.id === "summary-text") return "summary";
+  return null;
+}
+
+// ResizeObserver to track manual textarea resizing
+let _taResizeObserver = null;
+let _renderingNow = false; // flag to ignore observer callbacks during render/restore
+
+function _setupTextareaObserver(){
+  if(_taResizeObserver) _taResizeObserver.disconnect();
+  _taResizeObserver = new ResizeObserver(entries=>{
+    if(_renderingNow) return;
+    const d = active();
+    if(!d) return;
+    for(const entry of entries){
+      const ta = entry.target;
+      if(ta.tagName !== "TEXTAREA") continue;
+      const key = _taKey(ta);
+      if(!key) continue;
+      const h = Math.round(ta.offsetHeight);
+      if(h > 0 && d.textareaHeights[key] !== h){
+        d.textareaHeights[key] = h;
+        // Heights are kept in local state only — no Firebase persist here
+        // to avoid render → observer → persist → listener → render loop
+      }
+    }
+  });
+  // Observe all textareas inside main
+  for(const ta of main.querySelectorAll("textarea")){
+    if(_taKey(ta)) _taResizeObserver.observe(ta);
+  }
+}
+
+// Restore saved heights to textareas after render
+function _restoreTextareaHeights(){
+  const d = active();
+  if(!d || !d.textareaHeights) return;
+  _renderingNow = true;
+  for(const ta of main.querySelectorAll("textarea")){
+    const key = _taKey(ta);
+    if(key && d.textareaHeights[key]){
+      ta.style.height = d.textareaHeights[key] + "px";
+    }
+  }
+  // Allow a frame for the observer to settle, then re-enable tracking
+  requestAnimationFrame(()=>{ _renderingNow = false; });
+}
+
+// ---- Minimal per-render binding (only for inline-edit focus/blur) ----
+function bind(){
+  const d=active();
+  if(!d) return;
+
+  // Restore textarea heights and start observing resizes
+  _restoreTextareaHeights();
+  _setupTextareaObserver();
+
+  const ei=document.getElementById("edit-input");
+  if(ei){
+    ei.focus(); const n=ei.value.length; ei.setSelectionRange(n,n);
+    let done=false;
+    const save=()=>{ if(done)return; done=true;
+      const [type,id]=editing.split("|"); const v=ei.value.trim();
+      if(v){
+        if(type==="obj"){ const o=d.objectives.find(x=>x.id===id); if(o)o.name=v; }
+        else { const a=d.alternatives.find(x=>x.id===id); if(a)a.name=v; }
+      }
+      editing=null; persist(); render(); };
+    ei.addEventListener("keydown",e=>{
+      if(e.key==="Enter")save();
+      if(e.key==="Escape"){done=true;editing=null;render();}
+    });
+    ei.addEventListener("blur",save);
+  }
+}
+
+window.addEventListener("beforeunload",e=>{
+  // Flush any pending debounced persist
+  if(_persistTimer){ clearTimeout(_persistTimer); _persistTimer=null; persist(); }
+  if(syncStatus==="saving"){ e.preventDefault(); e.returnValue=""; }
+});
+
+// ---------- Auth ----------
+const loginScreen = document.getElementById("login-screen");
+const loginBtn = document.getElementById("login-btn");
+const loginError = document.getElementById("login-error");
+const logoutBtn = document.getElementById("logout-btn");
+const userInfoEl = document.getElementById("user-info");
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+loginBtn.addEventListener("click", ()=>{
+  loginError.textContent = "";
+  if(isMobile){
+    // Redirect flow — more reliable on mobile (no popup to block)
+    auth.signInWithRedirect(googleProvider);
+  } else {
+    auth.signInWithPopup(googleProvider).catch(err=>{
+      const msg = {
+        "auth/popup-closed-by-user":"Cửa sổ đăng nhập đã bị đóng.",
+        "auth/cancelled-popup-request":"",
+        "auth/popup-blocked":"Trình duyệt chặn cửa sổ đăng nhập. Hãy cho phép popup."
+      }[err.code] || err.message;
+      if(msg) loginError.textContent = msg;
+    });
+  }
+});
+
+// Handle redirect result (fires on page load after mobile sign-in redirect)
+auth.getRedirectResult().then(result=>{
+  // If we got a redirect result, auth state will update via onAuthStateChanged
+  if(result && result.user) loginError.textContent = "";
+}).catch(err=>{
+  if(err.code && err.code !== "auth/cancelled-popup-request"){
+    loginError.textContent = err.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+    loginBtn.style.display = "";
+  }
+});
+
+// If we're returning from a redirect, show loading state
+if(isMobile && sessionStorage.getItem("__auth_redirect")){
+  loginBtn.style.display = "none";
+  loginError.textContent = "Đang đăng nhập…";
+  loginError.style.color = "var(--ink-soft)";
+}
+// Mark when we start a redirect
+loginBtn.addEventListener("click", ()=>{
+  if(isMobile) sessionStorage.setItem("__auth_redirect","1");
+});
+
+logoutBtn.addEventListener("click",()=>{
+  if(unsubscribe && _listeningRef){ _listeningRef.off("value", unsubscribe); unsubscribe=null; _listeningRef=null; }
+  state.decisions=[]; state.activeId=null;
+  auth.signOut();
+});
+
+auth.onAuthStateChanged(user=>{
+  if(user){
+    sessionStorage.removeItem("__auth_redirect");
+    loginScreen.style.display="none";
+    logoutBtn.style.display="";
+    userInfoEl.style.display="";
+    userInfoEl.textContent=user.displayName||user.email;
+    render();            // ← show UI immediately (empty state) so screen is never blank
+    startListening();
+  } else {
+    sessionStorage.removeItem("__auth_redirect");
+    loginScreen.style.display="flex";
+    loginBtn.style.display="";
+    loginError.textContent="";
+    loginError.style.color="";
+    logoutBtn.style.display="none";
+    userInfoEl.style.display="none";
+    document.getElementById("sync-badge").style.display="none";
+    if(unsubscribe && _listeningRef){ _listeningRef.off("value", unsubscribe); unsubscribe=null; _listeningRef=null; }
+    state.decisions=[]; state.activeId=null;
+    main.innerHTML="";
+  }
+});
+</script>
+</body>
+</html>
